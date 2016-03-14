@@ -1,0 +1,14 @@
+form(role='form' action="/Person/#{entry.__unid}" method="POST")
+  h2 #{entry.full_name}
+  div.form-group
+    label(for="first_name") First Name
+    input.form-control(id="first_name" name="first_name" placeholder="Fred" value="#{entry.first_name}")
+  div.form-group
+    label(for="last_name") Last Name
+    input.form-control(id="last_name" name="last_name" placeholder="Bloggs" value="#{entry.last_name}")
+  if(error)
+    div.alert.alert-danger
+      | #{error}
+  div.btn-group.pull-right
+    button.btn.btn-primary(type='submit') Submit
+    a.btn.btn-danger(href="#" onclick="deleteEntry('#{entry.__unid}')") Delete

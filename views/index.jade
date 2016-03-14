@@ -1,0 +1,21 @@
+extends layout
+include pagination
+block content
+  row
+    div.col-md-4
+      div.list-group#entrylist
+        div.list-group-item
+          div.input-group
+            input.form-control#search(placeholder="Search for..." onkeypress="searchkey(event)")
+            span.input-group-btn
+              button.btn.btn-default(onclick="search()") Go!
+        if (entries.data.length > 0)
+          each entry in entries.data
+            a.list-group-item.entry-item(href="#" onclick="loadEntry(this, '#{entry.__unid}')") #{entry.full_name}
+        else
+          a.list-group-item.disabled(href="#") No people to display
+      if (entries.count > 0)
+        +pagination(entries.start,entries.pages,entries.currentpage,'/entries/')
+    div.col-md-8
+      div#entrydata
+        div.well Select a person, or create a new person using the button above.

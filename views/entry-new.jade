@@ -1,0 +1,15 @@
+div#entrydata
+  form(role='form' action="/newentry" method="POST")
+    h2 New Person
+    div.form-group
+      label(for="first_name") First Name
+      input.form-control(id="first_name" name="first_name" placeholder="Fred")
+    div.form-group
+      label(for="last_name") Last Name
+      input.form-control(id="last_name" name="last_name" placeholder="Bloggs")
+    if(error)
+      div.alert.alert-danger
+        | #{error}
+    div.btn-group.pull-right
+      button.btn.btn-primary(type='submit') Submit
+      a.btn.btn-default(href="/") Cancel

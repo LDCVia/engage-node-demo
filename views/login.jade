@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  form.form-signin(role='form' action="/login" method="POST")
+    h2.form-signin-heading Please sign in
+    input.form-control(name='email', id='email', type='email', placeholder='Email address', required='', autofocus='')
+    input.form-control(name='password', id='password', type='password', placeholder='Password', required='')
+    if(error)
+      div.alert.alert-danger
+        if(error == "valid api key required in http headers")
+          | Session expired, please log in again
+        else
+          | #{error}
+    button.btn.btn-lg.btn-primary.btn-block(type='submit') Log in
+    a.btn.btn-default.btn-block(href="https://eu.ldcvia.com/login/forgot") Forget your password?
+    a.btn.btn-default.btn-block(href="https://eu.ldcvia.com/register") Don&#8217;t have an account? Register now

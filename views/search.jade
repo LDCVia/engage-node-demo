@@ -1,0 +1,11 @@
+div.list-group-item
+  div.input-group
+    input.form-control#search(placeholder="Search for..." value="#{search}" onkeypress="searchkey(event)")
+    span.input-group-btn
+      a.btn.btn-default(href="/") Clear
+      button.btn.btn-default(onclick="search()") Go!
+if (entries.data.length > 0)
+  each entry in entries.data
+    a.list-group-item.entry-item(href="#" onclick="loadEntry(this, '#{entry.__unid}')") #{entry.full_name}
+else
+  a.list-group-item.disabled(href="#") No People To Display

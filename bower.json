@@ -1,0 +1,25 @@
+{
+  "name": "password-vault",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Matt White <matt@ldcvia.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/LDCVia/password-vault",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "moment": "~2.11.1",
+    "jquery": "~2.2.0",
+    "ckeditor": "~4.5.6",
+    "bootbox.js": "bootbox#^4.4.0"
+  }
+}
