@@ -1,4 +1,5 @@
 var express = require('express');
+var config = require('../config');
 var router = express.Router();
 var auth = require('../controllers/authorisation');
 var restler = require('restler');
@@ -11,14 +12,19 @@ function getCookies(req){
       return key + "=" + val['connect.sid'];
     }
   }).join("; ");
+
   return cookies;
 }
 
 /* Application home page */
 router.get('/', auth.requiresLogin,  function(req, res, next) {
+  var url = config.apihost + "/1.0/collections/" + config.db + "/Person?count=10";
+  // TOD debug code
+  console.log('DEBUG URL is ' + url);
+
   try{
     restler.get(
-      process.env.LDCVIA_DEMO_APIHOST + "/1.0/collections/" + process.env.LDCVIA_DEMO_DB + "/Person?count=10",
+      url,
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       if(response.statusCode == 200){
@@ -29,7 +35,7 @@ router.get('/', auth.requiresLogin,  function(req, res, next) {
         data.pages = Math.ceil(data.count / 10);
         data.currentpage = data.start / 10;
         if (data.currentpage < 1) data.currentpage = 1;
-        res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": "Engage node.js LDC Via Demo"});
+        res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": config.title});
       }else{
         res.render("login", { "error": data });
       }
@@ -47,7 +53,7 @@ router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
   try{
     var start = ((req.params.pageno - 1) * 10);
     restler.get(
-      process.env.LDCVIA_DEMO_APIHOST + "/1.0/collections/" + process.env.LDCVIA_DEMO_DB + "/Person?count=10&start=" + start,
+      config.apihost + "/1.0/collections/" + config.db + "/Person?count=10&start=" + start,
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       if(response.statusCode == 200){
@@ -56,7 +62,7 @@ router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
         data.pages = Math.ceil(data.count / 10);
 
         data.currentpage = req.params.pageno;
-        res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": "Engage node.js LDC Via Demo"});
+        res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": config.title});
       }else{
         res.render("login", { "error": data });
       }
@@ -74,7 +80,7 @@ router.get('/newentry', auth.requiresLogin, function(req, res, next){
     res.render("entry-new", {
       "tab": "newentry",
       "email": req.cookies.email,
-      "title": "New Person | Engage node.js LDC Via Demo"
+      "title": "New Person | " + config.title
     });
 });
 
@@ -88,7 +94,7 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
   data.__form = "Person";
 
   restler.putJson(
-    process.env.LDCVIA_DEMO_APIHOST + "/1.0/document/" + process.env.LDCVIA_DEMO_DB + "/Person/" + data.__unid, data, { headers: {'cookie': getCookies(req) } }
+    config.apihost + "/1.0/document/" + config.db + "/Person/" + data.__unid, data, { headers: {'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
     res.redirect("/");
   });
@@ -97,10 +103,10 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
 router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
       restler.get(
-        process.env.LDCVIA_DEMO_APIHOST + "/1.0/document/" + process.env.LDCVIA_DEMO_DB + "/Person/" + req.params.unid + "?all",
+        config.apihost + "/1.0/document/" + config.db + "/Person/" + req.params.unid + "?all",
         { headers: { 'cookie': getCookies(req) } }
       ).on('complete', function(data, response){
-        res.render('entry-read', {"tab":"entry", "email": req.cookies.email, "entry": data, "title": data.title + " | Engage node.js LDC Via Demo"});
+        res.render('entry-read', {"tab":"entry", "email": req.cookies.email, "entry": data, "title": data.title + " | "+ config.title});
       });
   }catch(e){
     res.render("login", {"error": e});
@@ -110,7 +116,7 @@ router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
 router.delete('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
     restler.del(
-      process.env.LDCVIA_DEMO_APIHOST + "/1.0/document/" + process.env.LDCVIA_DEMO_DB + "/Person/" + req.params.unid + "?all",
+      config.apihost + "/1.0/document/" + config.db + "/Person/" + req.params.unid + "?all",
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       res.status(200).send(data);
@@ -129,7 +135,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
   data.__unid = Date.now();
 
   restler.postJson(
-    process.env.LDCVIA_DEMO_APIHOST + "/1.0/document/" + process.env.LDCVIA_DEMO_DB + "/Person/" + data.__unid,
+    config.apihost + "/1.0/document/" + config.db + "/Person/" + data.__unid,
     data,
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
@@ -139,7 +145,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
 
 router.get('/search', auth.requiresLogin, function(req, res, next){
   restler.postJson(
-    process.env.LDCVIA_DEMO_APIHOST + "/1.0/search/" + process.env.LDCVIA_DEMO_DB + "/Person?count=10",
+    config.apihost + "/1.0/search/" + config.db + "/Person?count=10",
     {"fulltext": req.query.query},
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
@@ -149,7 +155,7 @@ router.get('/search', auth.requiresLogin, function(req, res, next){
 
 router.get('/about', function(req, res, next) {
   try{
-    res.render('static-about', {"tab":"about", "email": req.cookies.email, "title": "About | Engage node.js LDC Via Demo"});
+    res.render('static-about', {"tab":"about", "email": req.cookies.email, "title": "About | " + config.title});
   }catch(e){
     res.render("login", { "error": e });
   }
@@ -157,7 +163,7 @@ router.get('/about', function(req, res, next) {
 
 router.get('/contact', function(req, res, next) {
   try{
-    res.render('static-contact', {"tab":"contact", "email": req.cookies.email, "title": "Contact | Engage node.js LDC Via Demo"});
+    res.render('static-contact', {"tab":"contact", "email": req.cookies.email, "title": "Contact | " + config.title});
   }catch(e){
     res.render("login", { "error": e });
   }
@@ -165,14 +171,14 @@ router.get('/contact', function(req, res, next) {
 
 /* GET login page */
 router.get('/login',  function(req, res, next) {
-  res.render('login', {"tab": "home", "title": "Login | Engage node.js LDC Via Demo"});
+  res.render('login', { "tab": "home", "title": "Login | " + config.title });
 });
 
 router.post('/login', function(req, res, next){
   try{
     restler.postJson(
-      process.env.LDCVIA_DEMO_APIHOST + "/login",
-      {'username': req.body.email, 'email': req.body.email, 'password': req.body.password}
+      config.apihost + "/login",
+      {'username': req.body.email, 'password': req.body.password}
     ).on('complete', function (data, response){
       var setcookie = response.headers["set-cookie"];
       var cookieobj = {};
