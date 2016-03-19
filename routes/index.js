@@ -18,27 +18,33 @@ function getCookies(req){
 
 /* Application home page */
 router.get('/', auth.requiresLogin,  function(req, res, next) {
-  var url = config.apihost + "/1.0/collections/" + config.db + "/Person?count=10";
+  var url = config.apihost + "/collections/" + config.db + "/Person?count=10";
 
   try{
+    // TODO debug code here
+    console.log('DEBUG trying to retrieve ' + url);
     restler.get(
       url,
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       if(response.statusCode == 200){
-        if (!data){
-          data = {data: []};
-        }
+        if (!data) data = { data: [] };
         data.start=1;
         data.pages = Math.ceil(data.count / 10);
         data.currentpage = data.start / 10;
         if (data.currentpage < 1) data.currentpage = 1;
+        console.log('DEBUG rendering data:');
+        console.dir(data);
         res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": config.title});
-      }else{
+      } else {
+        console.log('DEBUG didn\'t get a 200 - response data follows');
+        console.dir(data);
         res.render("login", { "error": data });
       }
     });
   }catch(e){
+    console.log('Some kind of error...');
+    console.dir(e);
     if (e.indexOf("valid api key") > -1){
       res.render("login", { "error": "Your session has expired. Please log in again." });
     } else {
@@ -51,7 +57,7 @@ router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
   try{
     var start = ((req.params.pageno - 1) * 10);
     restler.get(
-      config.apihost + "/1.0/collections/" + config.db + "/Person?count=10&start=" + start,
+      config.apihost + "/collections/" + config.db + "/Person?count=10&start=" + start,
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       if(response.statusCode == 200){
@@ -92,7 +98,7 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
   data.__form = "Person";
 
   restler.putJson(
-    config.apihost + "/1.0/document/" + config.db + "/Person/" + data.__unid, data, { headers: {'cookie': getCookies(req) } }
+    config.apihost + "/document/" + config.db + "/Person/" + data.__unid, data, { headers: {'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
     res.redirect("/");
   });
@@ -101,7 +107,7 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
 router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
       restler.get(
-        config.apihost + "/1.0/document/" + config.db + "/Person/" + req.params.unid + "?all",
+        config.apihost + "/document/" + config.db + "/Person/" + req.params.unid + "?all",
         { headers: { 'cookie': getCookies(req) } }
       ).on('complete', function(data, response){
         res.render('entry-read', {"tab":"entry", "email": req.cookies.email, "entry": data, "title": data.title + " | "+ config.title});
@@ -114,7 +120,7 @@ router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
 router.delete('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
     restler.del(
-      config.apihost + "/1.0/document/" + config.db + "/Person/" + req.params.unid + "?all",
+      config.apihost + "/document/" + config.db + "/Person/" + req.params.unid + "?all",
       { headers: { 'cookie': getCookies(req) } }
     ).on('complete', function(data, response){
       res.status(200).send(data);
@@ -133,7 +139,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
   data.__unid = Date.now();
 
   restler.postJson(
-    config.apihost + "/1.0/document/" + config.db + "/Person/" + data.__unid,
+    config.apihost + "/document/" + config.db + "/Person/" + data.__unid,
     data,
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
@@ -143,7 +149,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
 
 router.get('/search', auth.requiresLogin, function(req, res, next){
   restler.postJson(
-    config.apihost + "/1.0/search/" + config.db + "/Person?count=10",
+    config.apihost + "/search/" + config.db + "/Person?count=10",
     {"fulltext": req.query.query},
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
