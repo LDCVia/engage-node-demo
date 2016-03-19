@@ -1,5 +1,5 @@
 var express = require('express');
-var config = require('../config');
+var config = require('../config/config');
 var router = express.Router();
 var auth = require('../controllers/authorisation');
 var restler = require('restler');
@@ -19,8 +19,6 @@ function getCookies(req){
 /* Application home page */
 router.get('/', auth.requiresLogin,  function(req, res, next) {
   var url = config.apihost + "/1.0/collections/" + config.db + "/Person?count=10";
-  // TOD debug code
-  console.log('DEBUG URL is ' + url);
 
   try{
     restler.get(
@@ -183,19 +181,20 @@ router.post('/login', function(req, res, next){
       var setcookie = response.headers["set-cookie"];
       var cookieobj = {};
       for (var i=0; i<setcookie.length; i++){
-        if (setcookie[i].indexOf("connect.sid=") > -1){
-          cookieobj = cookie.parse(setcookie[i]);
-        }
+        if (setcookie[i].indexOf("connect.sid=") > -1) cookieobj = cookie.parse(setcookie[i]);
       }
-      if (cookieobj['connect.sid'] && data.success){
+
+      if (cookieobj['connect.sid']){
         res.cookie('connect.sid', cookieobj);
         res.cookie('email', req.body.email);
         res.redirect("/");
-      }else{
-        res.render("login", {"error": data.errors[0]});
+      } else {
+        var errMsg = "Unknown authentication error";
+        if(data.errors) errMsg = data.errors[0];
+        res.render("login", {"error": errMsg});
       }
     });
-  }catch(e){
+  } catch(e){
     console.log(e);
     res.render("/login");
   }
