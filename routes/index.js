@@ -16,13 +16,11 @@ function getCookies(req){
   return cookies;
 }
 
-/* Application home page */
+/* Home page: redirect to /login if required */
 router.get('/', auth.requiresLogin,  function(req, res, next) {
   var url = config.apihost + "/collections/" + config.db + "/Person?count=10";
 
   try{
-    // TODO debug code here
-    console.log('DEBUG trying to retrieve ' + url);
     restler.get(
       url,
       { headers: { 'cookie': getCookies(req) } }
@@ -33,12 +31,8 @@ router.get('/', auth.requiresLogin,  function(req, res, next) {
         data.pages = Math.ceil(data.count / 10);
         data.currentpage = data.start / 10;
         if (data.currentpage < 1) data.currentpage = 1;
-        console.log('DEBUG rendering data:');
-        console.dir(data);
         res.render('index', {"tab":"home", "email": req.cookies.email, "entries": data, "title": config.title});
       } else {
-        console.log('DEBUG didn\'t get a 200 - response data follows');
-        console.dir(data);
         res.render("login", { "error": data });
       }
     });
@@ -53,6 +47,7 @@ router.get('/', auth.requiresLogin,  function(req, res, next) {
   }
 });
 
+/* Pagination */
 router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
   try{
     var start = ((req.params.pageno - 1) * 10);
@@ -80,6 +75,7 @@ router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
   }
 });
 
+/* Set the screen for submitting a new Person entry */
 router.get('/newentry', auth.requiresLogin, function(req, res, next){
     res.render("entry-new", {
       "tab": "newentry",
@@ -88,6 +84,7 @@ router.get('/newentry', auth.requiresLogin, function(req, res, next){
     });
 });
 
+/* POST a new person in to the collection */
 router.post('/newentry', auth.requiresLogin, function(req, res, next){
   var data = {};
   data.first_name = req.body.first_name;
@@ -104,6 +101,7 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
   });
 });
 
+/* GET a defined Person entry */
 router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
       restler.get(
@@ -117,6 +115,7 @@ router.get('/entry/:unid', auth.requiresLogin, function(req, res, next){
   }
 });
 
+/* Delete a defined Person entry */
 router.delete('/entry/:unid', auth.requiresLogin, function(req, res, next){
   try{
     restler.del(
@@ -130,16 +129,16 @@ router.delete('/entry/:unid', auth.requiresLogin, function(req, res, next){
   }
 });
 
+/* POST an update to existing Person entry */
 router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
+  var unid = req.params.unid;
   var data = {};
   data.first_name = req.body.first_name;
   data.last_name = req.body.last_name;
   data.full_name = req.body.first_name + req.body.last_name;
-  data.__form = "Person";
-  data.__unid = Date.now();
 
   restler.postJson(
-    config.apihost + "/document/" + config.db + "/Person/" + data.__unid,
+    config.apihost + "/document/" + config.db + "/Person/" + unid,
     data,
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
@@ -147,6 +146,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
   });
 });
 
+/* Search request: TODO this is not code yet! */
 router.get('/search', auth.requiresLogin, function(req, res, next){
   restler.postJson(
     config.apihost + "/search/" + config.db + "/Person?count=10",
@@ -157,6 +157,7 @@ router.get('/search', auth.requiresLogin, function(req, res, next){
   });
 });
 
+/* Static about page */
 router.get('/about', function(req, res, next) {
   try{
     res.render('static-about', {"tab":"about", "email": req.cookies.email, "title": "About | " + config.title});
@@ -165,6 +166,7 @@ router.get('/about', function(req, res, next) {
   }
 });
 
+/* Static contact page */
 router.get('/contact', function(req, res, next) {
   try{
     res.render('static-contact', {"tab":"contact", "email": req.cookies.email, "title": "Contact | " + config.title});
@@ -178,6 +180,7 @@ router.get('/login',  function(req, res, next) {
   res.render('login', { "tab": "home", "title": "Login | " + config.title });
 });
 
+/* Submit login request to API */
 router.post('/login', function(req, res, next){
   try{
     restler.postJson(
@@ -206,6 +209,7 @@ router.post('/login', function(req, res, next){
   }
 });
 
+/* Logout page */
 router.get('/logout', auth.requiresLogin, function(req, res, next){
   res.clearCookie('connect.sid');
   res.clearCookie('email');
