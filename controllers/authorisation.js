@@ -1,7 +1,9 @@
-/*
- *  Generic require login routing middleware
- */
-exports.requiresLogin = function (req, res, next) {
-  if (req.cookies['connect.sid'] !== null) return next();
-  res.redirect('/login');
-};
+/* Generic middleware: authentication routing */
+ (function() {
+   'use strict';
+  exports.requiresLogin = function (req, res, next) {
+    if (req.cookies['connect.sid'] !== undefined) return next();
+    res.redirect('/login');
+  };
+
+}());
