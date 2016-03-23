@@ -146,10 +146,11 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
   });
 });
 
-/* Search request: TODO this is not code yet! */
+/* Search request */
 router.get('/search', auth.requiresLogin, function(req, res, next){
+  var url = config.apihost + "/search/" + config.db + "/Person?count=10";
   restler.postJson(
-    config.apihost + "/search/" + config.db + "/Person?count=10",
+    url,
     {"fulltext": req.query.query},
     { headers: { 'cookie': getCookies(req) } }
   ).on('complete', function(data, response){
