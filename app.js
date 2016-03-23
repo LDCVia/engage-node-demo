@@ -33,7 +33,7 @@
 
   // Catch 404s and forward to our normal err handler
   app.use(function(req, res, next) {
-    var err = new Error('Resource / page not found');
+    var err = new Error('Resource or page not found');
     err.status = 404;
     next(err);
   });
