@@ -48,7 +48,7 @@ router.get('/', auth.requiresLogin,  function(req, res, next) {
 });
 
 /* Pagination */
-router.get('/Person/:pageno', auth.requiresLogin,  function(req, res, next) {
+router.get('/entries/:pageno', auth.requiresLogin,  function(req, res, next) {
   try{
     var start = ((req.params.pageno - 1) * 10);
     restler.get(
