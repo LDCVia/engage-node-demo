@@ -15,7 +15,7 @@
   // View engine
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
-  console.log("LDC VIA API host: " + config.apihost);
+  console.log("Running against LDC Via API host " + config.apihost);
 
   app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   app.use(logger('dev'));
@@ -25,8 +25,8 @@
   app.use(express.static(path.join(__dirname, 'public')));
   app.use('/bower_components', express.static(path.join(__dirname, '/bower_components')));
 
-  app.locals._      = require('underscore');
-  app.locals._.str  = require('underscore.string');
+  app.locals._ = require('underscore');
+  app.locals._.str = require('underscore.string');
   app.locals.moment = require('moment');
 
   app.use('/', routes);
