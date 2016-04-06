@@ -89,7 +89,7 @@ router.post('/newentry', auth.requiresLogin, function(req, res, next){
   var data = {};
   data.first_name = req.body.first_name;
   data.last_name = req.body.last_name;
-  data.full_name = req.body.first_name + req.body.last_name;
+  data.FullName = req.body.first_name + req.body.last_name;
   data.datecreated = new Date();
   data.__unid = Date.now();
   data.__form = "Person";
@@ -135,7 +135,7 @@ router.post('/Person/:unid', auth.requiresLogin, function(req, res, next){
   var data = {};
   data.first_name = req.body.first_name;
   data.last_name = req.body.last_name;
-  data.full_name = req.body.first_name + req.body.last_name;
+  data.FullName = req.body.first_name + req.body.last_name;
 
   restler.postJson(
     config.apihost + "/document/" + config.db + "/Person/" + unid,

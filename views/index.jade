@@ -11,7 +11,7 @@ block content
               button.btn.btn-default(onclick="search(); return false;") Go!
         if (entries.data!==undefined && entries.data.length > 0)
           each entry in entries.data
-            a.list-group-item.entry-item(href="#" onclick="loadEntry(this, '#{entry.__unid}')") #{entry.full_name}
+            a.list-group-item.entry-item(href="#" onclick="loadEntry(this, '#{entry.__unid}')") #{entry.FullName}
         else
           a.list-group-item.disabled(href="#") No people to display
       if (entries.count > 0)
