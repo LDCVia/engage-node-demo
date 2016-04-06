@@ -1,5 +1,5 @@
 form(role='form' action="/Person/#{entry.__unid}" method="POST")
-  h2 #{entry.full_name}
+  h2 #{entry.FullName}
   div.form-group
     label(for="first_name") First Name
     input.form-control(id="first_name" name="first_name" placeholder="Fred" value="#{entry.first_name}")
