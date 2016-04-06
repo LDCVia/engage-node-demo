@@ -15,7 +15,7 @@
   // View engine
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
-  console.log("Running against LDC Via API host " + config.apihost);
+  console.log(config.title + " running. API host is " + config.apihost);
 
   app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   app.use(logger('dev'));
@@ -28,6 +28,7 @@
   app.locals._ = require('underscore');
   app.locals._.str = require('underscore.string');
   app.locals.moment = require('moment');
+  app.locals.config = config;
 
   app.use('/', routes);
 
