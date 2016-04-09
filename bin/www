@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var app = require('../app');
-var debug = require('debug')('engage-ldc-via-demo:server');
+var debug = require('debug')('ldc-via-node-demo:server');
 var http = require('http');
 var port = 5000;
 
